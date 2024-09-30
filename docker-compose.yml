@@ -15,7 +15,7 @@ services:
       - movie_db
 
   movie_db:
-    image: postgres:12.1-alpine
+    image: assma123/movie-service:latest
     volumes:
       - postgres_data_movie:/var/lib/postgresql/data/
     environment:
@@ -36,7 +36,7 @@ services:
       - cast_db
 
   cast_db:
-    image: postgres:12.1-alpine
+    image: assma123/cast-service:latest
     volumes:
       - postgres_data_cast:/var/lib/postgresql/data/
     environment:
