@@ -165,10 +165,6 @@ pipeline {
             }
         }
         stage('Deploiement en prod avec Helm') {
-             when {
-                // Condition pour ne déployer que si la branche est 'master'
-                branch 'master'
-            }
             steps {
                 script {
                     // Demande de confirmation avant de procéder au déploiement en prod
