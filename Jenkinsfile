@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
+                    branches: [[name: '*/master']], 
                     extensions: [], 
                     userRemoteConfigs: [[url: 'https://github.com/asmaakhaider/python-microservice-fastapi-Deploy-to-Kubernetes-Using-Jenkins']]
                 ])
