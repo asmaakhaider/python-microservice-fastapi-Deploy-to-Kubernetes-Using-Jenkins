@@ -68,7 +68,7 @@ pipeline {
             }
         }
 
-stage('Deploiement en dev avec Helm') {
+        stage('Deploiement en dev avec Helm') {
             steps {
                 script {
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
@@ -83,8 +83,15 @@ stage('Deploiement en dev avec Helm') {
                     // Installation des Helm Charts pour movie-service
                     sh "helm upgrade --install movie-service ./movie-helm/ --namespace dev"
                     
+                    // Installation des Helm Charts pour cast-db
+                    sh "helm upgrade --install cast-db ./helm-castdb/ --namespace dev"
+                    
+                    // Installation des Helm Charts pour cast-service
+                    sh "helm upgrade --install cast-service ./helm-castservice/ --namespace dev"
+
                     // Vérification des pods après le déploiement
                     sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace dev"
+                    
                     // Vérification des services dans l'espace de noms dev
                     sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get services --namespace dev"
                 }
@@ -92,4 +99,3 @@ stage('Deploiement en dev avec Helm') {
         }
     }
 }
-
