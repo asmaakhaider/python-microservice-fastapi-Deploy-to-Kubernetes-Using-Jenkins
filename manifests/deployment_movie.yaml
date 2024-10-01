@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-service
+  template:
+    metadata:
+      labels:
+        app: movie-service
+    spec:
+      containers:
+        - name: movie-service
+          image: assma123/movie-service:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URI
+              value: "postgresql://movie_db_username:movie_db_password@movie-db/movie_db_dev"
+            - name: CAST_SERVICE_HOST_URL
+              value: "http://cast_service:8000/api/v1/casts/"
+          volumeMounts:
+            - name: app-volume
+              mountPath: /app
+      volumes:
+        - name: app-volume
+          hostPath:
+            path: /home/ubuntu/python-microservice-fastapi-Deploy-to-Kubernetes-Using-Jenkins/movie-service
+            type: Directory
