@@ -69,6 +69,10 @@ pipeline {
         }
 
         stage('Deploiement en dev avec Helm') {
+            when {
+                // Condition pour ne déployer que si la branche est 'master'
+                branch 'master'
+            }
             steps {
                 script {
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
@@ -97,5 +101,102 @@ pipeline {
                 }
             }
         }
+        stage('Deploiement en qa avec Helm') {
+             when {
+                // Condition pour ne déployer que si la branche est 'master'
+                branch 'master'
+            }
+            steps {
+                script {
+                    // Créer l'espace de noms dev si ce n'est pas déjà fait
+                    sh "kubectl create namespace qa || true"
+                    
+                    // Vérification des pods avant le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace qa"
+        
+                    // Installation des Helm Charts pour movie-service
+                    sh "helm upgrade --install movie-service ./movie-helm/ --namespace qa"
+                    
+                    // Installation des Helm Charts pour cast-service
+                    sh "helm upgrade --install cast-service ./helm-castservice/ --namespace qa"
+                    
+                    // Installation des Helm Charts pour cast-db
+                    sh "helm upgrade --install cast-db ./helm-castdb/ --namespace qa"
+                    
+                     // Installation des Helm Charts pour PostgreSQL
+                    sh "helm upgrade --install postgres-service ./postgres-helm/ --namespace qa"
+                    
+                    // Vérification des pods après le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace qa"
+                    
+                    // Vérification des services dans l'espace de noms dev
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get services --namespace qa"
+                }
+            }
+        }
+        stage('Deploiement en staging avec Helm') {
+       
+            steps {
+                script {
+                    // Créer l'espace de noms dev si ce n'est pas déjà fait
+                    sh "kubectl create namespace staging || true"
+                    
+                    // Vérification des pods avant le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace staging"
+        
+                    // Installation des Helm Charts pour movie-service
+                    sh "helm upgrade --install movie-service ./movie-helm/ --namespace staging"
+                    
+                    // Installation des Helm Charts pour cast-service
+                    sh "helm upgrade --install cast-service ./helm-castservice/ --namespace staging"
+                    
+                    // Installation des Helm Charts pour cast-db
+                    sh "helm upgrade --install cast-db ./helm-castdb/ --namespace staging"
+                    
+                     // Installation des Helm Charts pour PostgreSQL
+                    sh "helm upgrade --install postgres-service ./postgres-helm/ --namespace staging"
+                    
+                    // Vérification des pods après le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace staging"
+                    
+                    // Vérification des services dans l'espace de noms staging
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get services --namespace staging"
+                }
+            }
+        }
+        stage('Deploiement en prod avec Helm') {
+             when {
+                // Condition pour ne déployer que si la branche est 'master'
+                branch 'master'
+            }
+            steps {
+                script {
+                    // Créer l'espace de noms dev si ce n'est pas déjà fait
+                    sh "kubectl create namespace prod || true"
+                    
+                    // Vérification des pods avant le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace prod"
+        
+                    // Installation des Helm Charts pour movie-service
+                    sh "helm upgrade --install movie-service ./movie-helm/ --namespace prod"
+                    
+                    // Installation des Helm Charts pour cast-service
+                    sh "helm upgrade --install cast-service ./helm-castservice/ --namespace prod"
+                    
+                    // Installation des Helm Charts pour cast-db
+                    sh "helm upgrade --install cast-db ./helm-castdb/ --namespace prod"
+                    
+                     // Installation des Helm Charts pour PostgreSQL
+                    sh "helm upgrade --install postgres-service ./postgres-helm/ --namespace prod"
+                    
+                    // Vérification des pods après le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace prod"
+                    
+                    // Vérification des services dans l'espace de noms dev
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get services --namespace prod"
+                }
+            }
+        } 
+
     }
 }
