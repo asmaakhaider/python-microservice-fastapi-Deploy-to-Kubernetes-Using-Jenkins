@@ -53,14 +53,43 @@ pipeline {
         stage('Docker run') { 
             steps {
                 script {
+                    // Arrêter et supprimer les conteneurs existants s'ils utilisent les mêmes ports
                     sh '''
+                    docker ps -q --filter "publish=8001" | grep -q . && docker stop $(docker ps -q --filter "publish=8001") || true
+                    docker ps -q --filter "publish=8002" | grep -q . && docker stop $(docker ps -q --filter "publish=8002") || true
+                    
                     docker run -d -p 8001:8000 assma123/movie-service:${BUILD_NUMBER}
                     docker run -d -p 8002:8000 assma123/cast-service:${BUILD_NUMBER}
+                    
                     sleep 10
                     docker ps
                     '''
                 }
             }
         }
+
+stage('Deploiement en dev avec Helm') {
+            steps {
+                script {
+                    // Créer l'espace de noms dev si ce n'est pas déjà fait
+                    sh "kubectl create namespace dev || true"
+                    
+                    // Vérification des pods avant le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace dev"
+                    
+                    // Installation des Helm Charts pour PostgreSQL
+                    sh "helm upgrade --install postgres-service ./postgres-helm/ --namespace dev"
+                    
+                    // Installation des Helm Charts pour movie-service
+                    sh "helm upgrade --install movie-service ./movie-helm/ --namespace dev"
+                    
+                    // Vérification des pods après le déploiement
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get pods --namespace dev"
+                    // Vérification des services dans l'espace de noms dev
+                    sh "kubectl --kubeconfig=/var/lib/jenkins/.kube/config get services --namespace dev"
+                }
+            }
+        }
     }
 }
+

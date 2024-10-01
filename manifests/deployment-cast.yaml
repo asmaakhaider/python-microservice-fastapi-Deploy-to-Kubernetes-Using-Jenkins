@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-service-deployment
+  labels:
+    app: cast-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-service
+  template:
+    metadata:
+      labels:
+        app: cast-service
+    spec:
+      containers:
+        - name: cast-service
+          image: assma123/cast-service:latest
+          command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8002"]  # Lancer FastAPI sur le port 8000
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DATABASE_URI
+              value: "postgresql://cast_db_username:cast_db_password@cast-db/cast_db_dev"
+          volumeMounts:
+            - name: app-volume
+              mountPath: /app
+      volumes:
+        - name: app-volume
+          hostPath:
+            path: /home/ubuntu/python-microservice-fastapi-Deploy-to-Kubernetes-Using-Jenkins/cast-service
+            type: Directory
