@@ -69,12 +69,11 @@ pipeline {
         }
 
         stage('Deploiement en dev avec Helm') {
-            when {
-                // Condition pour ne déployer que si la branche est 'master'
-                branch 'master'
-            }
+            
             steps {
                 script {
+                    // Demande de confirmation avant de procéder au déploiement en prod
+                    input message: "Confirmez-vous le déploiement en production ?", ok: "Déployer"
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
                     sh "kubectl create namespace dev || true"
                     
@@ -102,12 +101,11 @@ pipeline {
             }
         }
         stage('Deploiement en qa avec Helm') {
-             when {
-                // Condition pour ne déployer que si la branche est 'master'
-                branch 'master'
-            }
+             
             steps {
                 script {
+                    // Demande de confirmation avant de procéder au déploiement en prod
+                    input message: "Confirmez-vous le déploiement en production ?", ok: "Déployer"
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
                     sh "kubectl create namespace qa || true"
                     
@@ -138,6 +136,8 @@ pipeline {
        
             steps {
                 script {
+                    // Demande de confirmation avant de procéder au déploiement en prod
+                    input message: "Confirmez-vous le déploiement en production ?", ok: "Déployer"
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
                     sh "kubectl create namespace staging || true"
                     
