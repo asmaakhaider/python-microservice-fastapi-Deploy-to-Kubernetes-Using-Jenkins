@@ -171,6 +171,8 @@ pipeline {
             }
             steps {
                 script {
+                    // Demande de confirmation avant de procéder au déploiement en prod
+                    input message: "Confirmez-vous le déploiement en production ?", ok: "Déployer"
                     // Créer l'espace de noms dev si ce n'est pas déjà fait
                     sh "kubectl create namespace prod || true"
                     
